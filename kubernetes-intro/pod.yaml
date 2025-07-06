@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: homework-1
+  namespace: homework
+spec:
+  initContainers:
+    - name: init
+      image: busybox:1.37.0
+      command: ["sh", "-c", "wget https://kubernetes.io -O /init/index.html"]
+      volumeMounts:
+        - name: homework-vol
+          mountPath: "/init"
+
+  containers:
+    - name: nginx
+      image: nginx:1.29.0-alpine
+      ports:
+        - containerPort: 8000
+      lifecycle:
+        preStop:
+          exec:
+            command: ["sh", "-c", "rm -rf /homework/*"]
+      volumeMounts:
+        - name: homework-vol
+          mountPath: /homework
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+          readOnly: true
+
+  volumes:
+    - name: homework-vol
+      emptyDir: {}
+    - name: nginx-config
+      configMap:
+        name: nginx-config
+        items:
+        - key: default.conf
+          path: default.conf
+
