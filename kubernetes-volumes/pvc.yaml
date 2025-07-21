@@ -1,0 +1,31 @@
+#apiVersion: v1
+#kind: PersistentVolume
+#metadata:
+#  namespace: homework
+#  name: init-pv
+#spec:
+#  capacity:
+#    storage: 1Gi
+#  storageClassName: "my-sc"
+#  claimRef:
+#    name: init-pvc
+#    namespace: homework
+#  accessModes:
+#    - ReadWriteOnce
+#  hostPath:
+#    path: "/mnt/data"
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: homework
+  name: init-pvc
+spec:
+  storageClassName: "my-sc" 
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+

@@ -1,0 +1,22 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: new-cm
+  namespace: homework
+data:
+  key1.html: |
+    <!DOCTYPE html>
+    <html>
+    <body>
+    <h1>Head1</h1>
+    <p>Text1</p>
+    </body>
+    </html>
+  key2.html: |
+    <!DOCTYPE html>
+    <html>
+    <body>
+    <h1>Head2</h1>
+    <p>Text2</p>
+    </body>
+    </html>
