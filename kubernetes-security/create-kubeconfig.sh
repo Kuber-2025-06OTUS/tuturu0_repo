@@ -14,17 +14,18 @@ ca=$(kubectl -n ${ns} get secret ${secret_name} -o jsonpath='{.data.ca\.crt}')
 
 cat << EOF > kubeconfig
 apiVersion: v1
+kind: Config
 clusters:
-- cluster:
-  name: $cluster_name
-    certificate-authority-data: $ca
-    server: $cluster_addr
+  - name: $cluster_name
+    cluster:
+      certificate-authority-data: $ca
+      server: $cluster_addr
 contexts:
-- context:
-  name: ${sa}@${cluster_name}
-    cluster: $cluster_name
-    namespace: $ns
-    user: $sa
+  - name: ${sa}@${cluster_name}
+    context:
+      cluster: $cluster_name
+      namespace: $ns
+      user: $sa
 users:
 - name: $sa
   user:

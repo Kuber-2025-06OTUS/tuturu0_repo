@@ -24,7 +24,7 @@ subjects:
     name: cd
     namespace: homework
 roleRef:
-  kind: ClusterRole
+  kind: Role
   name: cd-admin
   apiGroup: rbac.authorization.k8s.io
 ---
