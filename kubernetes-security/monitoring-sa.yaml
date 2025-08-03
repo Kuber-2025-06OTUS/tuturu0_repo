@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: monitoring
+  namespace: homework
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cl-mon-role
+rules:
+  - nonResourceURLs:
+      - "/metrics"
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cl-mon-bind
+subjects:
+  - kind: ServiceAccount
+    name: monitoring
+    namespace: homework
+roleRef:
+  kind: ClusterRole
+  name: cl-mon-role
+  apiGroup: rbac.authorization.k8s.io

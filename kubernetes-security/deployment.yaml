@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: homework
+  labels:
+    otus: homework
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      otus: homework
+  template:
+    metadata:
+      labels:
+        otus: homework
+    spec:
+      nodeSelector: 
+        homework: "true"
+      serviceAccount: cd
+      initContainers:
+        - name: init
+          image: alpine/curl:8.14.1
+          command: ['sh', '-c', 'curl --cacert ${SERVICEACCOUNT}/ca.crt --header "Authorization: Bearer $(cat ${SERVICEACCOUNT}/token)" -X GET ${APISERVER}/metrics -o /init/metrics.html']
+          env:
+            - name: APISERVER
+              value: https://kubernetes.default.svc.cluster.local
+            - name: SERVICEACCOUNT
+              value: /var/run/secrets/kubernetes.io/serviceaccount
+          volumeMounts:
+            - name: homework-vol
+              mountPath: "/init"
+
+      containers:
+        - name: nginx
+          image: nginx:1.29.0-alpine
+          readinessProbe:
+            httpGet:
+              path: /metrics.html
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 2
+          ports:
+            - containerPort: 8000
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "rm -rf /homework/*"]
+          volumeMounts:
+            - name: homework-vol
+              mountPath: /homework
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+
+      volumes:
+        - name: homework-vol
+          emptyDir:
+            sizeLimit: 500Mi
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+            items:
+              - key: default.conf
+                path: default.conf
+
