@@ -1,4 +1,5 @@
 replicaCount: 3
+
 image:
   repository: nginx
   tag: "1.29.0-alpine"
@@ -20,8 +21,22 @@ nginx:
   rootPath: /homework
   configName: nginx-config
 
+  # Настройка проб — включайте/выключайте через enabled
+  readiness:
+    enabled: true
+    path: /metrics.html
+    initialDelaySeconds: 10
+    periodSeconds: 2
+
+  liveness:
+    enabled: false
+    path: /healthz
+    initialDelaySeconds: 30
+    periodSeconds: 10
+
 service:
   port: 80
+
 selector:
   otus: homework
 
@@ -59,3 +74,4 @@ monitoring:
 
 initContainer:
   image: alpine/curl:8.14.1
+

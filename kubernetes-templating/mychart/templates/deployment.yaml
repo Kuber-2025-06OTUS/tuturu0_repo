@@ -7,13 +7,13 @@ metadata:
     otus: homework
 spec:
   replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      otus: homework
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 1
-  selector:
-    matchLabels:
-      otus: homework
   template:
     metadata:
       labels:
@@ -21,11 +21,13 @@ spec:
     spec:
 {{ toYaml .Values.nodeSelector | indent 6 }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
-
       initContainers:
         - name: init
           image: {{ .Values.initContainer.image | quote }}
-          command: ['sh', '-c', 'curl --cacert ${SERVICEACCOUNT}/ca.crt --header "Authorization: Bearer $(cat ${SERVICEACCOUNT}/token)" -X GET ${APISERVER}/metrics -o /init/metrics.html']
+          command:
+            - 'sh'
+            - '-c'
+            - 'curl --cacert ${SERVICEACCOUNT}/ca.crt --header "Authorization: Bearer $(cat ${SERVICEACCOUNT}/token)" -X GET ${APISERVER}/metrics -o /init/metrics.html'
           env:
             - name: APISERVER
               value: {{ .Values.cluster.server | quote }}
@@ -34,16 +36,25 @@ spec:
           volumeMounts:
             - name: homework-vol
               mountPath: "/init"
-
       containers:
         - name: nginx
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+{{- if .Values.nginx.readiness.enabled }}
           readinessProbe:
             httpGet:
-              path: /metrics.html
+              path: {{ .Values.nginx.readiness.path | quote }}
               port: {{ .Values.nginx.listenPort }}
-            initialDelaySeconds: 10
-            periodSeconds: 2
+            initialDelaySeconds: {{ .Values.nginx.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.nginx.readiness.periodSeconds }}
+{{- end }}
+{{- if .Values.nginx.liveness.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.nginx.liveness.path | quote }}
+              port: {{ .Values.nginx.listenPort }}
+            initialDelaySeconds: {{ .Values.nginx.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.nginx.liveness.periodSeconds }}
+{{- end }}
           ports:
             - containerPort: {{ .Values.nginx.listenPort }}
           lifecycle:
@@ -57,7 +68,6 @@ spec:
             - name: nginx-config
               mountPath: /etc/nginx/conf.d
               readOnly: true
-
       volumes:
         - name: homework-vol
           emptyDir:
