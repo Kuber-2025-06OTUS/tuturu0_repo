@@ -14,3 +14,4 @@ spec:
   endpoints:
     - port: metric
       interval: 5s
+
