@@ -1,0 +1,22 @@
+kind: Application
+metadata:
+  creationTimestamp: "2025-11-03T01:17:03Z"
+  generation: 23
+  name: kubernetes-templating
+  namespace: argocd
+  resourceVersion: "23592"
+  uid: d881722f-bfc4-4c44-87b8-c0cda86c9a2c
+spec:
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  project: otus
+  source:
+    path: kubernetes-templating/mychart
+    repoURL: git@github.com:Kuber-2025-06OTUS/tuturu0_repo.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      enabled: true
+      prune: true
+      selfHeal: true

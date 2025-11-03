@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  creationTimestamp: "2025-11-03T01:17:54Z"
+  generation: 5
+  name: kubernetes-networks
+  namespace: argocd
+  resourceVersion: "23134"
+  uid: 18a1296f-98bd-4f95-8cd3-6aa5b75b5f84
+spec:
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  project: otus
+  source:
+    path: kubernetes-networks
+    repoURL: git@github.com:Kuber-2025-06OTUS/tuturu0_repo.git
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    - Replace=true
