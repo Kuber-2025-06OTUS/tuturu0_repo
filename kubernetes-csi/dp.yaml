@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: homework
+  labels:
+    otus: homework
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      otus: homework
+  template:
+    metadata:
+      labels:
+        otus: homework
+    spec:
+      containers:
+        - name: init
+          image: busybox:1.37.0
+          command: ["sh", "-c", "wget https://kubernetes.io -O /init/index.html"]
+          volumeMounts:
+            - name: homework-vol
+              mountPath: /init
+      volumes:
+        - name: homework-vol
+          persistentVolumeClaim:
+            claimName: s3-pvc
