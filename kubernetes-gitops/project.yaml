@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  creationTimestamp: "2025-11-03T00:45:12Z"
+  generation: 4
+  name: otus
+  namespace: argocd
+  resourceVersion: "21997"
+  uid: 631289df-7de9-4be7-8f9f-97689be2cf58
+spec:
+  destinations:
+  - name: 'cluster'
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - 'git@github.com:Kuber-2025-06OTUS/tuturu0_repo.git'
